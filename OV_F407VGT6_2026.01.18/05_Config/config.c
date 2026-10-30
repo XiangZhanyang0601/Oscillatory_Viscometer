@@ -19,8 +19,8 @@ const LDC_RegConfig_t LDC_LHR_cfg[] = {
     // 中断报告事件
     {_LDC1101_REG_CFG_INTB_MODE, _LDC1101_INTB_MODE_DONT_REPORT_INTB_ON_SDO_PIN},
     // 采样率
-    {_LDC1101_REG_LHR_RCOUNT_LSB, 0x81},
-    {_LDC1101_REG_LHR_RCOUNT_MSB, 0x00},
+    {_LDC1101_REG_LHR_RCOUNT_LSB, 0x49},
+    {_LDC1101_REG_LHR_RCOUNT_MSB, 0x01},
     // 偏移修正（初始值，后续可以动态调整）
     {_LDC1101_REG_LHR_OFFSET_LSB, 0x00},
     {_LDC1101_REG_LHR_OFFSET_MSB, 0x00},
@@ -34,3 +34,45 @@ const uint16_t LDC_LHR_cfg_size = sizeof(LDC_LHR_cfg) / sizeof(LDC_LHR_cfg[0]);
  * ========================================================= */
 const LED_InitTypeDef LED1_hardware = {.GPIOx = GPIOB, .GPIO_Pin = GPIO_PIN_2, .ActiveLevel = LED_ACTIVE_HIGH};
 const LED_InitTypeDef LED2_hardware = {.GPIOx = GPIOD, .GPIO_Pin = GPIO_PIN_0, .ActiveLevel = LED_ACTIVE_HIGH};
+
+/* =========================================================
+ *             Viscometer Version Configuration
+ * ========================================================= */
+/* 版本表 */
+typedef enum {
+    VM_VERSION_1_0 = 0,
+
+    VM_VERSION_2_0_L,
+    VM_VERSION_2_0_M,
+    VM_VERSION_2_0_H,
+
+    VM_VERSION_2_1_L,
+    VM_VERSION_2_1_M,
+
+    VM_VERSION_2_2_L,
+    VM_VERSION_2_2_H,
+
+    VM_VERSION_COUNT /* 版本数量 */
+} FrequencyVersion;
+
+/* 版本参数表*/
+static const FrequencyConfig freq_config_table[VM_VERSION_COUNT] = {
+    /*
+     * 默认频率  扫频起点  扫频终点  频率步进  保持时间
+     * 默认占空比  扫描起点  扫描终点  占空比步进  保持时间
+     */
+    {547.0f, 544.5f, 551.4f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U}, /* 1_0 */
+
+    {272.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},  /* 2_0_L */
+    {547.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},  /* 2_0_M */
+    {1043.5f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U}, /* 2_0_H */
+
+    {225.0f, 272.0f, 277.2f, 0.1f, 30U, 84.0f, 83.0f, 84.0f, 0.1f, 10U}, /* 2_1_L */
+    {547.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},     /* 2_1_M */
+
+    {278.0f, 276.5f, 280.8f, 0.1f, 30U, 86.3f, 86.3f, 86.5f, 0.1f, 10U}, /* 2_2_L */
+    {0.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},       /* 2_2_H */
+};
+
+/* 当前版本选择 */
+const FrequencyConfig * const freq_config = &freq_config_table[VM_VERSION_2_2_L];

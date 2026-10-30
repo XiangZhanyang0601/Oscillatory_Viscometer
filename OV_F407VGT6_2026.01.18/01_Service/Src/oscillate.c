@@ -21,6 +21,8 @@ static Scan_Type_t s_scan_type           = SCAN_IDLE;
 static uint32_t s_tim1_cnt               = 0;
 static uint32_t s_tim4_cnt               = 0;
 
+static uint8_t s_pulse_period_cnt = 0;
+
 // 回调函数
 void Oscillate_RegisterScanCallback(OscillateScanCallback_t cb) { s_scan_callback = cb; }
 static void Oscillate_NotifyScanCallback(Oscillate_Scan_Event_t event) {
@@ -36,8 +38,8 @@ void Oscillate_Init(void) {
     DRV_Sleep(&hdrv1);
     s_oscillate_state = OSCILLATE_STOPPED;
     s_scan_type       = SCAN_IDLE;
-    drv_PWM_freq      = FREQ_DEFAULT_HZ_A;
-    drv_PWM_DR        = DUTY_RATIO_DEFAULT;
+    drv_PWM_freq      = freq_config->freq_default;
+    drv_PWM_DR        = freq_config->duty_default;
     Oscillate_CalculatePWMParam();
 }
 void Oscillate_Start(void) {
@@ -77,9 +79,9 @@ void Oscillate_ScanStart(Scan_Type_t type) {
 
     s_scan_type = type;
     if (type == SCAN_FREQ) {
-        drv_PWM_freq = (float)FREQ_SCAN_START_HZ;
+        drv_PWM_freq = (float)freq_config->freq_scan_start;
     } else if (type == SCAN_DR) {
-        drv_PWM_DR = (float)DUTY_RATIO_SCAN_START;
+        drv_PWM_DR = (float)freq_config->duty_scan_start;
     }
     Oscillate_CalculatePWMParam();
     HAL_TIM_Base_Start_IT(&htim4);
@@ -133,16 +135,20 @@ void Oscillate_TickISR(void) {
     } else if (s_tim1_cnt < s_PWM_halfCnt) {
         DRV_Coast(&hdrv1);
     } else if (s_tim1_cnt < s_PWM_halfCnt + s_PWM_assertCnt) {
-        // DRV_Reverse(&hdrv1);
+        DRV_Reverse(&hdrv1);
         drv_excitingLevel = false;
-        DRV_Coast(&hdrv1);
     } else if (s_tim1_cnt < s_PWM_cnt) {
         DRV_Coast(&hdrv1);
     } else {
         s_tim1_cnt = 0;
+        // TODO：任务变量在任务结束后没有初始化，会导致下次在脉冲模式下进入测量时出现异常。
+        // 问题来源：代码层级问题，任务状态的变量错误放置在振动服务层进行控制判断。暂时没有时间改 2026.06.23
         if (system_mode == MODE_PULSE_FEEDBACK) {
-            Oscillate_Stop();
-            return;
+            if (s_pulse_period_cnt >= PERIOD_CNT_FOR_PULSE) {
+                Oscillate_Stop();
+                return;
+            } else
+                s_pulse_period_cnt++;
         }
     }
     s_tim1_cnt++;
@@ -150,29 +156,35 @@ void Oscillate_TickISR(void) {
 void Oscillate_ScanISR(void) {
     switch (s_scan_type) {
         case SCAN_FREQ:
-            if (s_tim4_cnt > FREQ_SCAN_HOLD_TIME_MS) {
+            if (s_tim4_cnt >= freq_config->freq_scan_hold_ms) {
                 s_tim4_cnt = 0;
-                if (drv_PWM_freq + FREQ_SCAN_STEP_HZ > FREQ_SCAN_END_HZ) {
+
+                if (drv_PWM_freq + freq_config->freq_scan_step >= freq_config->freq_scan_end) {
                     Oscillate_ScanDone();
                 } else {
-                    drv_PWM_freq += FREQ_SCAN_STEP_HZ;
+                    drv_PWM_freq += freq_config->freq_scan_step;
                     Oscillate_CalculatePWMParam();
                 }
-            } else
+            } else {
                 s_tim4_cnt++;
+            }
             break;
+
         case SCAN_DR:
-            if (s_tim4_cnt > DUTY_RATIO_SCAN_HOLD_TIME_MS) {
+            if (s_tim4_cnt >= freq_config->duty_scan_hold_ms) {
                 s_tim4_cnt = 0;
-                if (drv_PWM_DR + DUTY_RATIO_SCAN_STEP > DUTY_RATIO_SCAN_END) {
+
+                if (drv_PWM_DR + freq_config->duty_scan_step >= freq_config->duty_scan_end) {
                     Oscillate_ScanDone();
                 } else {
-                    drv_PWM_DR += DUTY_RATIO_SCAN_STEP;
+                    drv_PWM_DR += freq_config->duty_scan_step;
                     Oscillate_CalculatePWMParam();
                 }
-            } else
+            } else {
                 s_tim4_cnt++;
+            }
             break;
+
         default:
             break;
     }

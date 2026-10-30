@@ -102,7 +102,7 @@ static const char *Mode_ToString(SysWorkMode mode) {
     switch (mode) {
         case MODE_MEASUREMENT:
             return "Measurement";
-        case MODE_CALIBRITION:
+        case MODE_CALIBRATION:
             return "Calibration";
         case MODE_PULSE_FEEDBACK:
             return "Pulse Feedback";
@@ -137,9 +137,9 @@ void OLED_Update(SysWorkMode system_mode) {
 
     /* 第四行 */
     x = OLED_ShowText(0U, 3U, "Freq Scan: ");
-    x = OLED_ShowNumAuto(x, 3U, (uint32_t)FREQ_SCAN_START_HZ, 2U);
+    x = OLED_ShowNumAuto(x, 3U, (uint32_t)freq_config->freq_scan_start, 2U);
     x = OLED_ShowText(x, 3U, "-");
-    OLED_ShowNumAuto(x, 3U, (uint32_t)FREQ_SCAN_END_HZ, 2U);
+    OLED_ShowNumAuto(x, 3U, (uint32_t)freq_config->freq_scan_end, 2U);
 
     /* 第 6、7 行：16 号字会占用两页 */
     OLED_ShowString(0U, 6U, "Viscosity: ", 16U, OLED_TEXT_INVERT);

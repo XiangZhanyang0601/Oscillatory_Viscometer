@@ -13,45 +13,50 @@ extern "C" {
  * ========================================================= */
 typedef enum {
     MODE_MEASUREMENT    = 0, // Mode0：测量模式
-    MODE_CALIBRITION    = 1, // Mode1：静态位移标定
+    MODE_CALIBRATION    = 1, // Mode1：静态位移标定
     MODE_PULSE_FEEDBACK = 2  // Mode2：脉冲响应测试
 } SysWorkMode;
 
-/* =========================================================
- *                 Frequency Configuration
- * ========================================================= */
-#define FREQ_DEFAULT_HZ_A      548
-#define FREQ_DEFAULT_HZ_B      1043.5
-#define FREQ_DEFAULT_HZ_C      273
-#define FREQ_SCAN_START_HZ     100  // 扫频起始频率  500
-#define FREQ_SCAN_END_HZ       1200 // 扫频终止频率  650
-#define FREQ_SCAN_STEP_HZ      0.5  // 扫频步进
-#define FREQ_SCAN_HOLD_TIME_MS 100  // 每个频率采集时间(ms)
+#define stable_time 1000U // 系统稳定时间(ms)，用于测量模式下的稳定性判断
+
+#define FREQ_SCAN_POINTS ((uint16_t)(((FREQ_SCAN_END_HZ - FREQ_SCAN_START_HZ) / FREQ_SCAN_STEP_HZ) + 0.5f) + 1)
+#define DR_SCAN_POINTS   ((uint16_t)(((DUTY_RATIO_SCAN_END - DUTY_RATIO_SCAN_START) / DUTY_RATIO_SCAN_STEP) + 0.5f) + 1)
 
 /* =========================================================
- *                  Duty Ratio Configuration
+ *               频率与占空比配置结构体
  * ========================================================= */
-#define DUTY_RATIO_DEFAULT           60
-#define DUTY_RATIO_SCAN_START        0   // 有效电平扫描起始比例
-#define DUTY_RATIO_SCAN_END          100 // 有效电平扫描终止比例
-#define DUTY_RATIO_SCAN_STEP         1   // 扫频步进
-#define DUTY_RATIO_SCAN_HOLD_TIME_MS 50  // 每个占空比采集时间(ms)
+typedef struct {
+    /* 频率配置 */
+    float freq_default;         /* 默认频率，Hz */
+    float freq_scan_start;      /* 扫频起始频率，Hz */
+    float freq_scan_end;        /* 扫频结束频率，Hz */
+    float freq_scan_step;       /* 扫频步进，Hz */
+    uint32_t freq_scan_hold_ms; /* 每个频率保持时间，ms */
+
+    /* 占空比配置 */
+    float duty_default;         /* 默认占空比，% */
+    float duty_scan_start;      /* 占空比扫描起点，% */
+    float duty_scan_end;        /* 占空比扫描终点，% */
+    float duty_scan_step;       /* 占空比扫描步进，百分点 */
+    uint32_t duty_scan_hold_ms; /* 每个占空比保持时间，ms */
+} FrequencyConfig;
+
+extern const FrequencyConfig * const freq_config;
 
 /* =========================================================
- *                  Calibrition Configuration
+ *                  Calibration Configuration
  * ========================================================= */
 #define CAL_SAMPLE_EPISODE   10U
 #define CAL_SAMPLE_NUM       1000U
-#define CAL_SETTLE_TIME_MS   200U
-#define CALIBRITION_START_UM 450U
-#define CALIBRITION_STEP_UM  1U
-#define CALIBRITION_STEP_DIR 1U // 1: 减少，0：原地观测，-1：增加
-typedef enum { CAL_IDLE = 0, CAL_WAIT_SETTLE, CAL_SAMPLING, CAL_DONE } CalState_t;
+#define CALIBRATION_START_UM 450U
+#define CALIBRATION_STEP_UM  1U
+#define CALIBRATION_STEP_DIR 1U // 1: 减少，0：原地观测，-1：增加
 
 /* =========================================================
  *                 Pulse Feedback Configuration
  * ========================================================= */
-#define PULSE_FEEDBACK_MAX_NUM     3000U
+#define PERIOD_CNT_FOR_PULSE       200U // 振动周期计数阈值，达到后停止振动
+#define PULSE_FEEDBACK_MAX_NUM     20000U
 #define PULSE_FEEDBACK_TRIGGER_MAX 10U
 
 /* =========================================================

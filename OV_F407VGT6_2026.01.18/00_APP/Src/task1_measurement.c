@@ -6,6 +6,7 @@
 
 static volatile bool s_task1_is_running      = false;
 static volatile bool s_task1_is_running_last = false;
+static volatile uint32_t s_task1_hang_time   = 0;
 
 static volatile bool s_scan_start_request = 0;
 static volatile bool s_scan_done_request  = 0;
@@ -62,8 +63,8 @@ void Task1_Measurement_Run(void) {
         }
         /* true -> false：停止 */
         else {
-            LHRSample_Stop();
             Oscillate_Stop();
+            LHRSample_Stop();
         }
         /* 状态更新 */
         s_task1_is_running_last = s_task1_is_running;

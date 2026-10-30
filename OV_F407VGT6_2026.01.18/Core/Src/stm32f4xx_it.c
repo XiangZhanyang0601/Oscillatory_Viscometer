@@ -400,7 +400,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
             button_scan_pending = true;
         }
         if (++tim3_oled_cnt >= 1000) {
-            tim3_oled_cnt       = 0;
+            tim3_oled_cnt = 0;
             OLED_SetUpdatePending();
         }
     }
@@ -418,6 +418,12 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c) {
     if (hi2c->Instance == I2C1) {
         OLED_ClearDMAFlag();
+    }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == GPIO_PIN_7) {
+        /* 在这里处理故障通知 */
     }
 }
 /* USER CODE END 1 */

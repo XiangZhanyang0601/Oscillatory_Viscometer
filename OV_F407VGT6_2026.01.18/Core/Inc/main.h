@@ -84,19 +84,6 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 extern SysWorkMode system_mode;
-/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Calibrition <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
-extern uint16_t cal_current_position_um;
-extern uint32_t cal_wait_start_tick;
-
-extern float mean_episode[CAL_SAMPLE_EPISODE];
-extern uint8_t cal_episode_cnt;
-extern uint32_t cal_sample_cnt;
-extern uint64_t cal_sum;
-extern uint64_t cal_sum_sq;
-extern uint32_t cal_total_sample_cnt;
-extern uint64_t cal_total_sum;
-extern uint64_t cal_total_sum_sq;
-extern volatile CalState_t cal_state;
 /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Pulse Feedback <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 extern volatile bool pulse_active;
 extern volatile uint8_t pulse_feedback_trigger;

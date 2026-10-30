@@ -12,6 +12,7 @@ virtualFolder:
       files:
         - path: ../00_APP/Src/command.c
         - path: ../00_APP/Src/task1_measurement.c
+        - path: ../00_APP/Src/task2_calibration.c
         - path: ../00_APP/Src/task3_pulse.c
         - path: ../00_APP/Src/my_button.c
       folders: []
@@ -135,7 +136,8 @@ targets:
         - ../MDK-ARM/RTE/_OV_F407VGT6_2026.01.18
       libList: []
     excludeList: []
-    settings: {}
+    settings:
+      debugger: cortex-debug
     toolchain: AC6
     toolchainConfigMap:
       AC6:

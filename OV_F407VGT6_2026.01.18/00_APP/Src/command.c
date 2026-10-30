@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "task1_measurement.h"
+#include "task2_calibration.h"
 
 extern UART_HandleTypeDef huart2;
 
@@ -47,8 +48,15 @@ void Command_Parse(char *cmd) {
     /* 读取LDC寄存器 */
     else if (strncmp(cmd, "Read:", 5) == 0) {
     }
-    /* LDC状态检查 */
-    else if ((strncmp(cmd, "RPL Check", 9) == 0) || (strncmp(cmd, "LHR Check", 9) == 0)) {
+    /* Task1 启动 */
+    else if ((strncmp(cmd, "Task1 Toggle", 12) == 0)) {
+        Task1_Measurement_Toggle();
+        sprintf(UART2_TX_buffer, "Task1 toggled.\r\n");
+    }
+    /* Task2 启动 */
+    else if ((strncmp(cmd, "Task2 Run", 9) == 0)) {
+        Task2_Calibration_Trigger();
+        sprintf(UART2_TX_buffer, "Task2 triggered.\r\n");
     } else {
         sprintf(UART2_TX_buffer, "Unknown command\r\n");
     }

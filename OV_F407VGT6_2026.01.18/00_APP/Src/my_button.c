@@ -2,6 +2,7 @@
 #include "my_button.h"
 #include "config.h"
 #include "task1_measurement.h"
+#include "task2_calibration.h"
 #include "task3_pulse.h"
 #include "usart2.h"
 #include "oled.h"
@@ -44,7 +45,8 @@ void btn1_single_click_handler(Button *btn) {
         case MODE_MEASUREMENT:
             Task1_Measurement_Toggle();
             break;
-        case MODE_CALIBRITION:
+        case MODE_CALIBRATION:
+            Task2_Calibration_Trigger();
             break;
         case MODE_PULSE_FEEDBACK:
             Task3_Pulse_Trigger();
@@ -52,49 +54,28 @@ void btn1_single_click_handler(Button *btn) {
         default:
             break;
     }
-
-    // if (system_mode == MODE_MEASUREMENT) {
-    //     HAL_GPIO_TogglePin(LED2_PORT, LED2_PIN);
-    //    // sprintf(UART2_TX_buffer, ldc2_isReading ? "Reading LHR Data.\r\n" : "Stopped LHR Data Reading.\r\n");
-    //     UART2_TX_send = true;
-    // } else if (system_mode == MODE_CALIBRITION) {
-    //     if (cal_state == CAL_IDLE) {
-    //         // 标定流程进入等待稳定阶段
-    //         cal_state = CAL_WAIT_SETTLE;
-    //         // 数据清空
-    //         cal_episode_cnt = 0;
-    //         memset(mean_episode, 0, sizeof(mean_episode));
-    //         cal_sample_cnt       = 0;
-    //         cal_sum              = 0;    //         cal_sum_sq           = 0;
-    //         cal_total_sample_cnt = 0;
-    //         cal_total_sum        = 0;
-    //         cal_total_sum_sq     = 0;
-    //         cal_wait_start_tick  = HAL_GetTick();
-
-    //         HAL_GPIO_TogglePin(LED3_PORT, LED3_PIN);
-    //         sprintf(UART2_TX_buffer, "Calibration start.\r\n");
-    //         UART2_TX_send = true;
-    //     }
-    // }
 }
 
 void btn1_double_click_handler(Button *btn) {
     switch (system_mode) {
         case MODE_MEASUREMENT:
-            Task1_Measurement_Init();
-            system_mode = MODE_CALIBRITION;
+            system_mode = MODE_CALIBRATION;
+            Task2_Calibration_Init();
             sprintf(UART2_TX_buffer, "Switch to Calibration Mode.\r\n");
             OLED_SetUpdatePending();
             UART2_TX_send = true;
             break;
-        case MODE_CALIBRITION:
+        case MODE_CALIBRATION:
+            Task2_Calibration_Init();
             system_mode = MODE_PULSE_FEEDBACK;
+            Task3_Pulse_Init();
             sprintf(UART2_TX_buffer, "Switch to Pulse Feedback Mode.\r\n");
             OLED_SetUpdatePending();
             UART2_TX_send = true;
             break;
         case MODE_PULSE_FEEDBACK:
             system_mode = MODE_MEASUREMENT;
+            Task1_Measurement_Init();
             sprintf(UART2_TX_buffer, "Switch to Measurement Mode.\r\n");
             OLED_SetUpdatePending();
             UART2_TX_send = true;
@@ -117,7 +98,7 @@ void btn2_single_click_handler(Button *btn) {
             sprintf(UART2_TX_buffer, "Frequency Scan Start. \r\n");
             UART2_TX_send = true;
             break;
-        case MODE_CALIBRITION:
+        case MODE_CALIBRATION:
             break;
         case MODE_PULSE_FEEDBACK:
             break;
@@ -160,9 +141,9 @@ void btn2_long_press_hold_handler(Button *btn) {
     if ((uint32_t)(now - btn2_last_freq_step_tick) >= interval_ms) {
         float freq = Oscillate_GetFreq();
         if (Oscillate_GetFreqStepDirection() == 1) {
-            freq += FREQ_SCAN_STEP_HZ;
+            freq += freq_config->freq_scan_step;
         } else {
-            freq -= FREQ_SCAN_STEP_HZ;
+            freq -= freq_config->freq_scan_step;
         }
         if (freq < 0) {
             freq = 0;
