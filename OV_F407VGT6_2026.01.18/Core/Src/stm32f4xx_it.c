@@ -26,6 +26,7 @@
 #include <my_button.h>
 #include "oscillate.h"
 #include "usart3.h"
+#include "ledctl_port.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -394,10 +395,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM3) {
         static uint8_t tim3_btn_cnt;
         static uint16_t tim3_oled_cnt;
+        LEDCtl_TickISR();
 
         if (++tim3_btn_cnt >= 25) {
-            tim3_btn_cnt        = 0;
-            button_scan_pending = true;
+            tim3_btn_cnt = 0;
+            Button_SetScanPending();
         }
         if (++tim3_oled_cnt >= 1000) {
             tim3_oled_cnt = 0;

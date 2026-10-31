@@ -1,19 +1,25 @@
 #include <stm32f4xx_hal.h>
-#include "my_button.h"
+
 #include "config.h"
+
+#include "my_button.h"
 #include "task1_measurement.h"
 #include "task2_calibration.h"
 #include "task3_pulse.h"
+
+#include "oscillate.h"
+#include "LEDCtl_port.h"
+#include "LEDCtl.h"
+
 #include "usart2.h"
 #include "oled.h"
 #include "oled_driver.h"
-#include "oscillate.h"
 
 extern SysWorkMode system_mode;
-extern bool oled_update_pending;
 
 static Button btn1;
 static Button btn2;
+static volatile bool button_scan_pending = false;
 
 #define BTN2_FREQ_STEP_INTERVAL_SLOW_MS    1000U
 #define BTN2_FREQ_STEP_INTERVAL_MEDIUM_MS  500U
@@ -26,6 +32,10 @@ static Button btn2;
 
 static uint32_t btn2_long_press_start_tick = 0U;
 static uint32_t btn2_last_freq_step_tick   = 0U;
+
+void Button_SetScanPending(void) { button_scan_pending = true; }
+void Button_ClearScanPending(void) { button_scan_pending = false; }
+bool Button_GetScanPending(void) { return button_scan_pending; }
 
 // 根据平台不同完成按键电平读取函数
 uint8_t getButtonLevel(uint8_t button_id) {
@@ -44,9 +54,11 @@ void btn1_single_click_handler(Button *btn) {
     switch (system_mode) {
         case MODE_MEASUREMENT:
             Task1_Measurement_Toggle();
+            LEDCtl_Breath(LEDCTL_RUN, 2000U);
             break;
         case MODE_CALIBRATION:
             Task2_Calibration_Trigger();
+            LEDCtl_Off(LEDCTL_RUN);
             break;
         case MODE_PULSE_FEEDBACK:
             Task3_Pulse_Trigger();
@@ -59,6 +71,7 @@ void btn1_single_click_handler(Button *btn) {
 void btn1_double_click_handler(Button *btn) {
     switch (system_mode) {
         case MODE_MEASUREMENT:
+            Task1_Measurement_Init();
             system_mode = MODE_CALIBRATION;
             Task2_Calibration_Init();
             sprintf(UART2_TX_buffer, "Switch to Calibration Mode.\r\n");
@@ -74,6 +87,7 @@ void btn1_double_click_handler(Button *btn) {
             UART2_TX_send = true;
             break;
         case MODE_PULSE_FEEDBACK:
+            Task3_Pulse_Init();
             system_mode = MODE_MEASUREMENT;
             Task1_Measurement_Init();
             sprintf(UART2_TX_buffer, "Switch to Measurement Mode.\r\n");
@@ -95,6 +109,7 @@ void btn2_single_click_handler(Button *btn) {
     switch (system_mode) {
         case MODE_MEASUREMENT:
             Oscillate_ScanStart(SCAN_FREQ);
+            LEDCtl_Blink(LEDCTL_RUN, 50U, 50U);
             sprintf(UART2_TX_buffer, "Frequency Scan Start. \r\n");
             UART2_TX_send = true;
             break;

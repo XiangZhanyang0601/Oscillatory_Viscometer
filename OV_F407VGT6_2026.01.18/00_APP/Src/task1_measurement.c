@@ -3,6 +3,7 @@
 #include "lhr_sample.h"
 #include "pack.h"
 #include "usart3.h"
+#include "ledctl.h"
 
 static volatile bool s_task1_is_running      = false;
 static volatile bool s_task1_is_running_last = false;
@@ -65,6 +66,7 @@ void Task1_Measurement_Run(void) {
         else {
             Oscillate_Stop();
             LHRSample_Stop();
+            LEDCtl_Off(LEDCTL_RUN);
         }
         /* 状态更新 */
         s_task1_is_running_last = s_task1_is_running;

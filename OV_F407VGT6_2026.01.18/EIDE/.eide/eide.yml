@@ -21,6 +21,7 @@ virtualFolder:
         - path: ../01_Service/Src/oscillate.c
         - path: ../01_Service/Src/lhr_sample.c
         - path: ../01_Service/Src/pack.c
+        - path: ../01_Service/Src/ledctl.c
       folders: []
     - name: 02_Middleware
       files: []

@@ -29,11 +29,13 @@ void Command_Parse(char *cmd) {
     /* 启动频率扫描 */
     else if (strncmp(cmd, "FR Scan", 7) == 0) {
         Oscillate_ScanStart(SCAN_FREQ);
+        LEDCtl_Blink(LEDCTL_RUN, 50U, 50U);
         sprintf(UART2_TX_buffer, "Frequency Scan Start. \r\n");
     }
     /* 启动占空比扫描 */
     else if (strncmp(cmd, "DR Scan", 7) == 0) {
         Oscillate_ScanStart(SCAN_DR);
+        LEDCtl_Blink(LEDCTL_RUN, 50U, 50U);
         sprintf(UART2_TX_buffer, "Duty Ratio Scan Start. \r\n");
     }
     /* 设置LDC采样频率 */
@@ -51,11 +53,13 @@ void Command_Parse(char *cmd) {
     /* Task1 启动 */
     else if ((strncmp(cmd, "Task1 Toggle", 12) == 0)) {
         Task1_Measurement_Toggle();
+        LEDCtl_Breath(LEDCTL_RUN, 2000U);
         sprintf(UART2_TX_buffer, "Task1 toggled.\r\n");
     }
     /* Task2 启动 */
     else if ((strncmp(cmd, "Task2 Run", 9) == 0)) {
         Task2_Calibration_Trigger();
+        LEDCtl_Off(LEDCTL_RUN);
         sprintf(UART2_TX_buffer, "Task2 triggered.\r\n");
     } else {
         sprintf(UART2_TX_buffer, "Unknown command\r\n");

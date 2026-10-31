@@ -4,7 +4,9 @@
             "path": ".."
         }
     ],
-    "settings": {},
+    "settings": {
+        "git.ignoreLimitWarning": true
+    },
     "extensions": {},
     "better-comments.multilineComments": true
 }

@@ -5,6 +5,7 @@
 #include "pack.h"
 #include "stm32f4xx_hal.h"
 #include "usart3.h"
+#include "LEDCtl.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -218,6 +219,7 @@ void Task2_Calibration_Run(void) {
             s_task2_is_running      = false;
             s_task2_is_running_last = false;
             s_cal_state             = CAL_STATE_IDLE;
+            LEDCtl_On(LEDCTL_RUN);
             return;
 
         case CAL_STATE_IDLE:

@@ -43,8 +43,6 @@ extern "C" {
 #include "oled_driver.h"
 #include "multi_button.h"
 
-#include "command.h"
-
 #include "utility.h"
 
 #include "usart2.h"
@@ -52,9 +50,11 @@ extern "C" {
 #include "oled.h"
 
 #include "my_button.h"
-
 #include "oscillate.h"
 #include "lhr_sample.h"
+#include "ledctl_port.h"
+
+#include "command.h"
 
 /* USER CODE END Includes */
 
@@ -84,13 +84,6 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 extern SysWorkMode system_mode;
-/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Pulse Feedback <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
-extern volatile bool pulse_active;
-extern volatile uint8_t pulse_feedback_trigger;
-extern volatile bool pulse_feedback_busy;
-extern volatile uint32_t pulse_feedback_frame_cnt;
-
-extern volatile bool button_scan_pending;
 /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADC <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 #define ADC_BUF_LEN           256
 #define ADC_DMA_BUF_LEN       (ADC_BUF_LEN * 2U)

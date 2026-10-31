@@ -19,8 +19,9 @@ typedef enum {
 
 #define stable_time 1000U // 系统稳定时间(ms)，用于测量模式下的稳定性判断
 
-#define FREQ_SCAN_POINTS ((uint16_t)(((FREQ_SCAN_END_HZ - FREQ_SCAN_START_HZ) / FREQ_SCAN_STEP_HZ) + 0.5f) + 1)
-#define DR_SCAN_POINTS   ((uint16_t)(((DUTY_RATIO_SCAN_END - DUTY_RATIO_SCAN_START) / DUTY_RATIO_SCAN_STEP) + 0.5f) + 1)
+// #define FREQ_SCAN_POINTS ((uint16_t)(((FREQ_SCAN_END_HZ - FREQ_SCAN_START_HZ) / FREQ_SCAN_STEP_HZ) + 0.5f) + 1)
+// #define DR_SCAN_POINTS   ((uint16_t)(((DUTY_RATIO_SCAN_END - DUTY_RATIO_SCAN_START) / DUTY_RATIO_SCAN_STEP) + 0.5f) +
+// 1)
 
 /* =========================================================
  *               频率与占空比配置结构体
