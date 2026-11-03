@@ -49,7 +49,9 @@ typedef enum {
     VM_VERSION_2_1_L,
     VM_VERSION_2_1_M,
 
-    VM_VERSION_2_2_L,
+    VM_VERSION_2_2_L_6V,
+    VM_VERSION_2_2_L_8V,
+    VM_VERSION_2_2_L_10V,
     VM_VERSION_2_2_H,
 
     VM_VERSION_COUNT /* 版本数量 */
@@ -70,9 +72,11 @@ static const FrequencyConfig freq_config_table[VM_VERSION_COUNT] = {
     {225.0f, 272.0f, 277.2f, 0.1f, 30U, 84.0f, 83.0f, 84.0f, 0.1f, 10U}, /* 2_1_L */
     {547.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},     /* 2_1_M */
 
-    {278.0f, 276.5f, 280.8f, 0.1f, 30U, 86.3f, 86.3f, 86.5f, 0.1f, 10U}, /* 2_2_L （10V-1120）*/
+    {278.0f, 276.0f, 281.8f, 0.1f, 30U, 86.3f, 80.0f, 90.0f, 0.1f, 10U}, /* 2_2_L （6V-1120）*/
+    {278.0f, 276.0f, 281.8f, 0.1f, 30U, 86.3f, 80.0f, 90.0f, 0.1f, 10U}, /* 2_2_L （8V-1120）*/
+    {278.0f, 276.0f, 281.8f, 0.1f, 30U, 86.3f, 86.3f, 86.5f, 0.1f, 10U}, /* 2_2_L （10V-1120）*/
     {0.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},       /* 2_2_H */
 };
 
 /* 当前版本选择 */
-const FrequencyConfig * const freq_config = &freq_config_table[VM_VERSION_2_2_L];
+const FrequencyConfig * const freq_config = &freq_config_table[VM_VERSION_2_2_L_8V];

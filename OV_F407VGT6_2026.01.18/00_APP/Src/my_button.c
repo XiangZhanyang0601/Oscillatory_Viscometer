@@ -101,7 +101,50 @@ void btn1_double_click_handler(Button *btn) {
 
 void btn1_long_press_start_handler(Button *btn) {}
 
-void btn1_long_press_hold_handler(Button *btn) {}
+void btn1_long_press_hold_handler(Button *btn) {
+    uint32_t now = HAL_GetTick();
+    uint32_t hold_ms;
+    uint32_t interval_ms;
+    static uint32_t last_hold_call_tick = 0U;
+
+    /*
+     * 只在本函数内判断一次新的长按过程：
+     * BTN_LONG_PRESS_HOLD 在松手后不会继续调用，所以用两次 HOLD 调用之间的间隔
+     * 来判断是否已经松手并重新长按。
+     */
+    if ((btn2_long_press_start_tick == 0U) || (last_hold_call_tick == 0U)
+        || ((uint32_t)(now - last_hold_call_tick) > 500U)) {
+        btn2_long_press_start_tick = now;
+        btn2_last_freq_step_tick   = now - BTN2_FREQ_STEP_INTERVAL_SLOW_MS;
+    }
+
+    last_hold_call_tick = now;
+    hold_ms             = (uint32_t)(now - btn2_long_press_start_tick);
+
+    if (hold_ms < BTN2_FREQ_ACCEL_STAGE1_MS) {
+        interval_ms = BTN2_FREQ_STEP_INTERVAL_SLOW_MS;
+    } else if (hold_ms < BTN2_FREQ_ACCEL_STAGE2_MS) {
+        interval_ms = BTN2_FREQ_STEP_INTERVAL_MEDIUM_MS;
+    } else if (hold_ms < BTN2_FREQ_ACCEL_STAGE3_MS) {
+        interval_ms = BTN2_FREQ_STEP_INTERVAL_FAST_MS;
+    } else {
+        interval_ms = BTN2_FREQ_STEP_INTERVAL_FASTEST_MS;
+    }
+
+    if ((uint32_t)(now - btn2_last_freq_step_tick) >= interval_ms) {
+        float DR = Oscillate_GetDutyRatio();
+        if (Oscillate_GetFreqStepDirection() == 1) {
+            DR += freq_config->duty_scan_step;
+        } else {
+            DR -= freq_config->duty_scan_step;
+        }
+        if (DR < 0) {
+            DR = freq_config->duty_default;
+        }
+        Oscillate_SetDutyRatio(DR);
+        btn2_last_freq_step_tick = now;
+    }
+}
 
 void btn1_press_repeat_handler(Button *btn) {}
 
