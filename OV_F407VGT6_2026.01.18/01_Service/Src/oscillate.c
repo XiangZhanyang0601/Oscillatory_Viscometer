@@ -1,4 +1,5 @@
 #include "oscillate.h"
+#include "math.h"
 
 extern DRV_HandleTypeDef hdrv1;
 extern TIM_HandleTypeDef htim1;
@@ -15,7 +16,6 @@ static float drv_PWM_freq                 = 0.0f;
 static float drv_PWM_DR                   = 0.0f;
 
 static volatile uint32_t s_PWM_cnt       = 0;
-static volatile uint32_t s_PWM_halfCnt   = 0;
 static volatile uint32_t s_PWM_assertCnt = 0;
 static Scan_Type_t s_scan_type           = SCAN_IDLE;
 static uint32_t s_tim1_cnt               = 0;
@@ -107,8 +107,8 @@ static void Oscillate_CalculatePWMParam(void) {
     s_PWM_cnt       = (uint32_t)(cnt_f + 0.5f);
     float assert_f  = cnt_f * (drv_PWM_DR / 100.0f);
     s_PWM_assertCnt = (uint32_t)(assert_f + 0.5f);
-    s_PWM_halfCnt   = s_PWM_cnt / 2;
 }
+
 void Oscillate_SetFreq(float freq) {
     if (freq <= 0.0f) {
         return;
@@ -132,13 +132,9 @@ void Oscillate_TickISR(void) {
     if (s_tim1_cnt < s_PWM_assertCnt) {
         DRV_Forward(&hdrv1);
         drv_excitingLevel = true;
-    } else if (s_tim1_cnt < s_PWM_halfCnt) {
-        DRV_Coast(&hdrv1);
-    } else if (s_tim1_cnt < s_PWM_halfCnt + s_PWM_assertCnt) {
+    } else if (s_tim1_cnt < s_PWM_cnt) {
         DRV_Reverse(&hdrv1);
         drv_excitingLevel = false;
-    } else if (s_tim1_cnt < s_PWM_cnt) {
-        DRV_Coast(&hdrv1);
     } else {
         s_tim1_cnt = 0;
         // TODO：任务变量在任务结束后没有初始化，会导致下次在脉冲模式下进入测量时出现异常。
