@@ -73,7 +73,7 @@ static const FrequencyConfig freq_config_table[VM_VERSION_COUNT] = {
     {547.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},     /* 2_1_M */
 
     {203.8f, 276.0f, 281.8f, 0.1f, 30U, 86.3f, 80.0f, 90.0f, 0.1f, 10U}, /* VM_VERSION_2_2_L_6V */
-    {203.8f, 201.5f, 206.3f, 0.1f, 30U, 86.3f, 0.0f, 100.0f, 0.1f, 10U}, /* VM_VERSION_2_2_L_8V */
+    {203.8f, 201.5f, 206.5f, 0.1f, 30U, 86.3f, 0.0f, 100.0f, 0.1f, 10U}, /* VM_VERSION_2_2_L_8V */
     {203.8f, 276.0f, 281.8f, 0.1f, 30U, 86.3f, 86.3f, 86.5f, 0.1f, 10U}, /* VM_VERSION_2_2_L_10V */
     {0.0f, 0.0f, 0.0f, 0.1f, 30U, 61.0f, 0.0f, 100.0f, 0.1f, 10U},       /* VM_VERSION_2_2_H */
 };
